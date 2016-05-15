@@ -17,11 +17,15 @@
 (defn get_me [token] 
     (helpers/body_json (client/get (str base_url token "/getMe"))))
 
-(defn send_message [token chat_id text] 
-    (let [url (str base_url token "/sendMessage")
-          data {:chat_id chat_id
-                :text text}]
-                (message url data)))
+(defn send_message 
+    ([token chat_id text]
+        (send_message token chat_id nil text))
+    ([token chat_id reply_to_message_id text] 
+        (let [url (str base_url token "/sendMessage")
+              data {:chat_id chat_id
+                    :text text
+                    :reply_to_message_id reply_to_message_id}]
+                    (message url data))))
 
 (defn forward_message [token chat_id from_chat_id message_id] 
     (let [url (str base_url token "/forwardMessage")
@@ -55,9 +59,14 @@
 ;;                :results results}]
 ;;                (message token url data)))
 
-(defn get_updates [token] 
-    (let [url (str base_url token "/getUpdates")]
-                (message url {})))
+(defn get_updates 
+    ([token]
+        (get_updates token nil))
+    ([token offset]
+        (let [url (str base_url token "/getUpdates")]
+                    (message url {
+                            :offset offset
+                        }))))
 
 (defn set_webhook [token webhook_url] 
     (let [url (str base_url token "/setWebhook")

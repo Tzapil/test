@@ -21,11 +21,10 @@
     c)
 
 (defn _handle [json [handler & other]]
-    (println "TEST")
     (if ((:pr handler) json)
-            ((:f handler) json)
-            (if (> (count other) 0)
-                (_handle json other))))
+        ((:f handler) json)
+        (if (> (count other) 0)
+          (_handle json other))))
 
 (defn start_handlers [handlers c]
     (async/go-loop []

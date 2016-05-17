@@ -13,7 +13,8 @@
     (bot/send_message bot-token (get-in data [:message :chat :id]) (get-in data [:message :text])))
 
 (def h [
-    (handlers/create_command "help" #(bot/send_message bot-token (get-in % [:message :chat :id]) "HELP HELP"))
+    (handlers/create_command "start" #(bot/send_message bot-token (get-in % [:message :chat :id]) "HI!"))
+    (handlers/create_command "help" #(bot/send_message bot-token (get-in % [:message :chat :id]) "HELP!"))
     {
         :pr (fn [m] true)
         :f echo

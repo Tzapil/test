@@ -13,3 +13,8 @@
         :pr pr
         :f f
     })
+
+(defn create_inline_query_handler [f] {
+        :pr #(not (nil? (get % :inline_query)))
+        :f f
+    })

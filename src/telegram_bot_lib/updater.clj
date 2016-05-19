@@ -3,9 +3,9 @@
               [telegram-bot-lib.bot :as bot]
               [telegram-bot-lib.helpers :as helpers]))
 
-(defn _start_polling [token c]
+(defn _start_polling [token c t]
     (async/go-loop [offset 0]
-            (async/<! (async/timeout 1000))   ;; 1 sec pause
+            (async/<! (async/timeout t))   ;; pause
             (recur (try
                         (let [updates (bot/get_updates token offset)
                               json (helpers/body_json updates)
@@ -35,9 +35,12 @@
             (recur)))
     c)
 
-(defn start_polling [token]
-    (let [c (async/chan)]
-        (_start_polling token c)))
+(defn start_polling 
+    ([token]
+        (start_polling token 1000))
+    ([token t]
+        (let [c (async/chan)]
+            (_start_polling token c t))))
 
 (defn idle 
     ([] 

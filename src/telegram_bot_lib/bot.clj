@@ -19,10 +19,10 @@
 
 (defn send_message 
     ([token chat_id text]
-        (send_message token chat_id nil text nil))
-    ([token chat_id reply_to_message_id text]
-        (send_message token chat_id reply_to_message_id text nil))
-    ([token chat_id reply_to_message_id text parse_mode] 
+        (send_message token chat_id text nil nil))
+    ([token chat_id text reply_to_message_id]
+        (send_message token chat_id text reply_to_message_id nil))
+    ([token chat_id text reply_to_message_id parse_mode] 
         (let [url (str base_url token "/sendMessage")
               data {:chat_id chat_id
                     :text text
@@ -56,12 +56,6 @@
                 :action action}]
                 (message url data)))
 
-;;(defn answer_inline_query [token inline_query_id results] 
-;;    (let [url (str base_url token "/answerInlineQuery")
-;;          data {:inline_query_id inline_query_id
-;;                :results results}]
-;;                (message token url data)))
-
 (defn get_updates 
     ([token]
         (get_updates token nil))
@@ -78,3 +72,9 @@
 
 (defn remove_webhook [token] 
     (set_webhook token ""))
+
+(defn answer_inline_query [token inline_query_id results] 
+    (let [url (str base_url token "/answerInlineQuery")
+          data {:inline_query_id inline_query_id
+                :results results}]
+                (message token url data)))

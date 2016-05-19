@@ -3,19 +3,38 @@
             [telegram-bot-lib.helpers :as helpers]
             [telegram-bot-lib.updater :as updater]
             [telegram-bot-lib.handlers :as handlers]
-            [telegram-bot-lib.filters :as filters])
+            [telegram-bot-lib.filters :as filters]
+            [telegram-bot-lib.inline :as inline]
+            [clojure.string :as string])
   (:gen-class))
 
 (def bot-token "***REMOVED***")
 
 (defn echo [data]
-    (println "ECHO_ANSWER: ")
-    (println (get-in data [:message :message_id]))
-    (bot/send_message bot-token (get-in data [:message :chat :id]) nil (get-in data [:message :text]) "Markdown"))
+    (let [id (get-in data [:message :chat :id])
+          text (get-in data [:message :text])]
+          (println "ECHO_ANSWER: ")
+          (print id)
+          (print text)
+          (bot/send_message bot-token id text nil "Markdown")))
+
+(defn escape_markdown [])
+
+(defn inline_handler [data]
+    (println "INLINE: ")
+    (let [id (get-in data [:inline_query :id])
+          iq (get-in data [:inline_query :query])
+          results [
+            (inline/create_result_article "Caps" (string/upper-case iq))
+            (inline/create_result_article "Bold" (str "*" iq "*") nil "Markdown")
+            (inline/create_result_article "Italic" (str "_" iq "_") nil "Markdown")
+          ]]
+        (bot/answer_inline_query bot-token id results)))
 
 (def h [
     (handlers/create_command "start" #(bot/send_message bot-token (get-in % [:message :chat :id]) "HI!"))
     (handlers/create_command "help" #(bot/send_message bot-token (get-in % [:message :chat :id]) "HELP!"))
+    (handlers/create_inline_query_handler inline_handler)
     (handlers/create_handler filters/text echo)
     ])
 

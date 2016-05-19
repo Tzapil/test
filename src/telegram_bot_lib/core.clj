@@ -11,7 +11,7 @@
 (defn echo [data]
     (println "ECHO_ANSWER: ")
     (println (get-in data [:message :message_id]))
-    (bot/send_message bot-token (get-in data [:message :chat :id]) (get-in data [:message :text])))
+    (bot/send_message bot-token (get-in data [:message :chat :id]) nil (get-in data [:message :text]) "Markdown"))
 
 (def h [
     (handlers/create_command "start" #(bot/send_message bot-token (get-in % [:message :chat :id]) "HI!"))

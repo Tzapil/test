@@ -2,7 +2,8 @@
   (:require [telegram-bot-lib.bot :as bot]
             [telegram-bot-lib.helpers :as helpers]
             [telegram-bot-lib.updater :as updater]
-            [telegram-bot-lib.handlers :as handlers])
+            [telegram-bot-lib.handlers :as handlers]
+            [telegram-bot-lib.filters :as filters])
   (:gen-class))
 
 (def bot-token "***REMOVED***")
@@ -15,10 +16,8 @@
 (def h [
     (handlers/create_command "start" #(bot/send_message bot-token (get-in % [:message :chat :id]) "HI!"))
     (handlers/create_command "help" #(bot/send_message bot-token (get-in % [:message :chat :id]) "HELP!"))
-    {
-        :pr (fn [m] true)
-        :f echo
-    }])
+    (handlers/create_handler filters/text echo)
+    ])
 
 (defn -main
   "I don't do a whole lot ... yet."

@@ -19,12 +19,15 @@
 
 (defn send_message 
     ([token chat_id text]
-        (send_message token chat_id nil text))
-    ([token chat_id reply_to_message_id text] 
+        (send_message token chat_id nil text nil))
+    ([token chat_id reply_to_message_id text]
+        (send_message token chat_id reply_to_message_id text nil))
+    ([token chat_id reply_to_message_id text parse_mode] 
         (let [url (str base_url token "/sendMessage")
               data {:chat_id chat_id
                     :text text
-                    :reply_to_message_id reply_to_message_id}]
+                    :reply_to_message_id reply_to_message_id
+                    :parse_mode parse_mode}]
                     (message url data))))
 
 (defn forward_message [token chat_id from_chat_id message_id] 

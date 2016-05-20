@@ -12,7 +12,8 @@
     })
 
 (defn message [url data] 
-    (client/post url (assoc base-json :form-params data)))
+    (let [fdata (into {} (filter #(not (nil? (second %))) data))]
+        (client/post url (assoc base-json :form-params fdata))))
 
 (defn get_me [token] 
     (helpers/body_json (client/get (str base_url token "/getMe"))))

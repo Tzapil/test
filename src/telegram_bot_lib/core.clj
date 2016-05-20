@@ -14,8 +14,8 @@
     (let [id (get-in data [:message :chat :id])
           text (get-in data [:message :text])]
           (println "ECHO_ANSWER: ")
-          (print id)
-          (print text)
+          (println id)
+          (println text)
           (bot/send_message bot-token id text nil "Markdown")))
 
 (defn escape_markdown [])

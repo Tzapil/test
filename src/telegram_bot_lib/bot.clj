@@ -11,9 +11,12 @@
         :accept :json
     })
 
-(defn message [url data] 
-    (let [fdata (into {} (filter #(not (nil? (second %))) data))]
-        (client/post url (assoc base-json :form-params fdata))))
+(defn message [url data]
+    (let [fdata (helpers/filter_hash data)]
+        (try
+            (client/post url (assoc base-json :form-params fdata))
+            (catch Exception e
+                (println (str "Caught exception: " (.getMessage e)))))))
 
 (defn get_me [token] 
     (helpers/body_json (client/get (str base_url token "/getMe"))))
@@ -78,4 +81,4 @@
     (let [url (str base_url token "/answerInlineQuery")
           data {:inline_query_id inline_query_id
                 :results results}]
-                (message token url data)))
+                (message url data)))

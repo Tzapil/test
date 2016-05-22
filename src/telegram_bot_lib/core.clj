@@ -35,7 +35,7 @@
     (handlers/create_command "start" #(bot/send_message bot-token (get-in % [:message :chat :id]) "HI!"))
     (handlers/create_command "help" #(bot/send_message bot-token (get-in % [:message :chat :id]) "HELP!"))
     (handlers/create_inline_query_handler inline_handler)
-    (handlers/create_handler filters/text echo)
+    ;;(handlers/create_handler filters/text echo)
     ])
 
 (defn -main

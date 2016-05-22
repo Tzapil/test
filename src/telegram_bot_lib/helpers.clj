@@ -20,3 +20,6 @@
             (if (instance? clojure.lang.PersistentVector value) 
                 {name (map #(filter_hash %) value)}
                 {name value}))) hm))))
+
+(defn parse-int [s]
+   (Integer. (re-find  #"\d+" s)))

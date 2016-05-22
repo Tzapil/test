@@ -1,4 +1,5 @@
-(ns telegram-bot-lib.handlers)
+(ns telegram-bot-lib.handlers
+    (:require [clojure.string :as string]))
 
 (defn check_command [n t]
     (let [r (re-pattern (str "/" n "(([@\\s].*)|$)"))]
@@ -18,3 +19,6 @@
         :pr #(not (nil? (get % :inline_query)))
         :f f
     })
+
+(defn parse_command_arguments [s]
+    (rest (string/split s #" ")))

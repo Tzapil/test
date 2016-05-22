@@ -43,9 +43,11 @@
         (bot/answer_inline_query bot-token id results)))
 
 (def h [
-    (handlers/create_command "start" #(bot/send_message bot-token (get-in % [:message :chat :id]) (str "HI!" emoji/WINKING_FACE)))
+    (handlers/create_command "start" #(bot/send_message bot-token (get-in % [:message :chat :id]) (str "HI! " emoji/WINKING_FACE)))
     (handlers/create_command "help" #(bot/send_message bot-token (get-in % [:message :chat :id]) "HELP!"))
     (handlers/create_command "set" timer)
+    (handlers/create_status_handler :new_chat_title #(bot/send_message bot-token (get-in % [:message :chat :id]) "WOW!"))
+    (handlers/create_status_handler :left_chat_member #(bot/send_message bot-token (get-in % [:message :chat :id]) "WAIT!"))
     (handlers/create_inline_query_handler inline_handler)
     ;;(handlers/create_handler filters/text echo)
     ])

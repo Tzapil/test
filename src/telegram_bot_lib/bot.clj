@@ -62,8 +62,12 @@
 
 (defn get_updates 
     ([token]
-        (get_updates token nil))
+        (get_updates token nil 100 0))
     ([token offset]
+        (get_updates token offset 100 0))
+    ([token offset limit]
+        (get_updates token offset limit 0))
+    ([token offset limit timeout]
         (let [url (str base_url token "/getUpdates")]
                     (message url {
                             :offset offset

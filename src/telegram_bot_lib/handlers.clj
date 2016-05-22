@@ -1,5 +1,6 @@
 (ns telegram-bot-lib.handlers
-    (:require [clojure.string :as string]))
+    (:require [clojure.string :as string]
+              [telegram-bot-lib.filters :as filters]))
 
 (defn check_command [n t]
     (let [r (re-pattern (str "/" n "(([@\\s].*)|$)"))]
@@ -19,6 +20,16 @@
         :pr #(not (nil? (get % :inline_query)))
         :f f
     })
+
+(defn create_status_handler 
+    ([f] {
+        :pr #(filters/status_update %)
+        :f f
+    })
+    ([status f] {
+        :pr #(not (nil? (get-in % [:message status])))
+        :f f
+    }))
 
 (defn parse_command_arguments [s]
     (rest (string/split s #" ")))

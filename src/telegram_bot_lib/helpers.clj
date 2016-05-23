@@ -21,5 +21,11 @@
                 {name (map #(filter_hash %) value)}
                 {name value}))) hm))))
 
-(defn parse-int [s]
+(defn parse_int [s]
    (Integer. (re-find  #"\d+" s)))
+
+(defn wrap_trycatch [f & args]
+    (try
+        (apply f args)
+        (catch Exception e
+            (println (str "Caught exception: " (.getMessage e))))))

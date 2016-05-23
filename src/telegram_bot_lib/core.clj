@@ -26,7 +26,7 @@
           args (handlers/parse_command_arguments text)]
           (if (nil? (re-find  #"\d+" (first args)))
               (bot/send_message bot-token id "Argument must be a number!")
-              (let [t (helpers/parse-int (first args))]
+              (let [t (helpers/parse_int (first args))]
                 (async/go
                     (async/<! (async/timeout t))
                     (bot/send_message bot-token id (str "Beep after " t " ms!")))))))
@@ -57,6 +57,6 @@
   [& args]
   (println (bot/get_me bot-token))
   ;;(println (bot/send_message "***REMOVED***" 53941045 "kokoko"))
-  (updater/start_handlers h (updater/start_polling bot-token))
+  (updater/start_handlers h (updater/start_polling bot-token 100 1000 0))
   ;;(.addShutdownHook (Runtime/getRuntime) (Thread. (fn [] (println "Shutting down..."))))
   (updater/idle))

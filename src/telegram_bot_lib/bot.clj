@@ -70,8 +70,9 @@
                             :offset offset
                         }))))
 
-(defn set_webhook [token webhook_url] 
-    (let [url (str base_url token "/setWebhook")
+(defn set_webhook [token listen port webhook_url] 
+    (let [listen_url (str "http://" listen ":" port "/" webhook_url)
+          url (str base_url token "/setWebhook")
           data {:url webhook_url}]
                 (message url data)))
 

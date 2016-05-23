@@ -6,7 +6,6 @@
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [clj-http "2.2.0"]
                  [cheshire "5.5.0"]
-                 [org.clojure/data.json "0.2.6"]
                  [org.clojure/core.async "0.2.374"]]
   :main ^:skip-aot telegram-bot-lib.core
   :target-path "target/%s"

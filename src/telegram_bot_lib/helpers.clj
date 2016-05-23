@@ -1,12 +1,12 @@
 (ns telegram-bot-lib.helpers
-    (:require [clojure.data.json :as json]))
+    (:require [cheshire.core :as cheshire]))
 
 (defn body_json [req]
-    (let [result (json/read-str (:body req) :key-fn keyword)]
+    (let [result (cheshire/parse-string (:body req) true)]
           (:result result)))
 
 (defn json_stringify [data]
-    (json/write-str data))
+    (cheshire/generate-string data))
 
 (defn uuid [] (.toString (java.util.UUID/randomUUID)))
 

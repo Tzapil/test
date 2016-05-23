@@ -3,26 +3,40 @@
               [telegram-bot-lib.bot :as bot]
               [telegram-bot-lib.helpers :as helpers]))
 
-(defn _start_polling [token c t]
+(defn make_poll [token c offset limit timeout]
+    (try
+        (let [updates (bot/get_updates token offset limit timeout)
+              json (helpers/body_json updates)
+              updates (count json)]
+            (if (= updates 0)
+                offset
+                (do
+                    (async/go (async/>! c json))
+                    (inc (reduce #(max %1 (get %2 :update_id)) offset json)))))
+        (catch Exception e
+            (println (str "Caught exception: " (.getMessage e)))
+            offset)))
+
+(defn long_polling [token c limit timeout pause]
     (async/go-loop [offset 0]
-            (async/<! (async/timeout t))   ;; pause
-            (recur (try
-                        (let [updates (bot/get_updates token offset)
-                              json (helpers/body_json updates)
-                              updates (count json)]
-                            (if (= updates 0)
-                                offset
-                                (do
-                                    (async/>! c json)
-                                    (inc (reduce #(max %1 (get %2 :update_id)) offset json)))))
-                        (catch Exception e
-                            (println (str "Caught exception: " (.getMessage e)))
-                            offset))))
+        (async/<! (async/timeout pause))   ;; pause
+        (recur (make_poll token c offset limit timeout)))
     c)
 
+(defn start_polling 
+    ([token]
+        (start_polling token 100 0 1000))
+    ([token limit]
+        (start_polling token limit 0 1000))
+    ([token limit timeout]
+        (start_polling token limit timeout 1000))
+    ([token limit timeout pause]
+        (let [c (async/chan)]
+            (long_polling token c limit timeout pause))))
+
 (defn _handle [json [handler & other]]
-    (if ((:pr handler) json)
-        ((:f handler) json)
+    (if (helpers/wrap_trycatch (:pr handler) json)
+        (helpers/wrap_trycatch (:f handler) json)
         (if (> (count other) 0)
           (_handle json other))))
 
@@ -34,13 +48,6 @@
                 (_handle json handlers))
             (recur)))
     c)
-
-(defn start_polling 
-    ([token]
-        (start_polling token 1000))
-    ([token t]
-        (let [c (async/chan)]
-            (_start_polling token c t))))
 
 (defn idle 
     ([] 

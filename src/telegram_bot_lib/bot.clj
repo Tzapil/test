@@ -6,17 +6,14 @@
 
 (def base-json {
         :content-type :json
-        :socket-timeout 1000  ;; in milliseconds
-        :conn-timeout 1000    ;; in milliseconds
+        ;;:socket-timeout 1000  ;; in milliseconds
+        ;;:conn-timeout 1000    ;; in milliseconds
         :accept :json
     })
 
 (defn message [url data]
     (let [fdata (helpers/filter_hash data)]
-        (try
-            (client/post url (assoc base-json :form-params fdata))
-            (catch Exception e
-                (println (str "Caught exception: " (.getMessage e)))))))
+        (client/post url (assoc base-json :form-params fdata))))
 
 (defn get_me [token] 
     (helpers/body_json (client/get (str base_url token "/getMe"))))

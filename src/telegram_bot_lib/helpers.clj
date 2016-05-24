@@ -24,8 +24,8 @@
 (defn parse_int [s]
    (Integer. (re-find  #"\d+" s)))
 
-(defn wrap_trycatch [f & args]
-    (try
-        (apply f args)
-        (catch Exception e
-            (println (str "Caught exception: " (.getMessage e))))))
+(defmacro wrap [& f]
+    `(try
+        ~@f
+        (catch Exception e#
+            (println (str "Caught exception: " (.getMessage e#))))))

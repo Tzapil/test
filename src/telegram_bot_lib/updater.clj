@@ -34,9 +34,16 @@
         (let [c (async/chan)]
             (long_polling token c limit timeout pause))))
 
+(defn start_webhook
+    ;; without certificate
+    ([token listen port webhook_url]
+        (let [listen_url (str "http://" listen ":" port "/" webhook_url)]
+            ))
+    ([token listen port webhook_url cert key]))
+
 (defn _handle [json [handler & other]]
-    (if (helpers/wrap_trycatch (:pr handler) json)
-        (helpers/wrap_trycatch (:f handler) json)
+    (if (helpers/wrap ((:pr handler) json))
+        (helpers/wrap ((:f handler) json))
         (if (> (count other) 0)
           (_handle json other))))
 

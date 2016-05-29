@@ -10,7 +10,7 @@
         (let [listen_url (str "https://" listen ":" port "/" url_path)
               c (async/chan)]
             (println (str "Listen: " listen_url))
-            (bot/set_webhook token listen_url)
+            (bot/set_webhook token listen_url "cert.pem")
             (async/go (server/start_server port keystore pswd 
                 (fn [request]
                     (println "REQUEST")

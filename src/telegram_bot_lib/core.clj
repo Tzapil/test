@@ -59,5 +59,5 @@
   ;;(println (bot/send_message "141043767:AAGOD1ZEAvzNUuii6_Zxy-zydbU2x5z77so" 53941045 "kokoko"))
   ;;(updater/start_handlers h (updater/start_polling bot-token 100 1000 0))
   ;;(.addShutdownHook (Runtime/getRuntime) (Thread. (fn [] (println "Shutting down..."))))
-  (updater/start_handlers h (updater/start_webhook bot-token "tzapil.tk" 8443 "hook" "certpkcs12.keystore" "LjvbrGfhbn1"))
+  (updater/start_handlers h (updater/start_webhook bot-token "tzapil.tk" 8443 "hook" "cert.keystore" "LjvbrGfhbn1"))
   (updater/idle))

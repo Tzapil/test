@@ -70,10 +70,17 @@
                             :offset offset
                         }))))
 
-(defn set_webhook [token webhook_url] 
-    (let [url (str base_url token "/setWebhook")
-          data {:url webhook_url}]
-                (message url data)))
+(defn set_webhook 
+    ([token webhook_url]
+        (let [url (str base_url token "/setWebhook")
+              data {:url webhook_url}]
+                    (message url data)))
+    ([token webhook_url certificate]
+        (let [url (str base_url token "/setWebhook")
+              data {:multipart [{:name "url" :content webhook_url}
+                                {:name "Content/type" :content "application/octet-stream"}
+                                {:name "certificate" :content (slurp certificate)}]}]
+                    (client/post url data))))
 
 (defn remove_webhook [token] 
     (set_webhook token ""))

@@ -1,7 +1,20 @@
 (ns telegram-bot-lib.updater
     (:require [clojure.core.async :as async]
               [telegram-bot-lib.bot :as bot]
-              [telegram-bot-lib.helpers :as helpers]))
+              [telegram-bot-lib.helpers :as helpers]
+              [telegram-bot-lib.webserver :as server]))
+
+(defn start_webhook
+    ([token listen port url_path keystore pswd]
+        (bot/remove_webhook token)
+        (let [listen_url (str "https://" listen ":" port "/" url_path)
+              c (async/chan)]
+            (print (str "Listen: " listen_url))
+            (bot/set_webhook token listen_url)
+            (async/go (server/start_server port keystore pswd 
+                (fn [request]
+                    (async/go (async/>! c request)))))
+            c)))
 
 (defn make_poll [token c offset limit timeout]
     (try
@@ -33,13 +46,6 @@
     ([token limit timeout pause]
         (let [c (async/chan)]
             (long_polling token c limit timeout pause))))
-
-(defn start_webhook
-    ;; without certificate
-    ([token listen port webhook_url]
-        (let [listen_url (str "http://" listen ":" port "/" webhook_url)]
-            ))
-    ([token listen port webhook_url cert key]))
 
 (defn _handle [json [handler & other]]
     (if (helpers/wrap ((:pr handler) json))

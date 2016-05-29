@@ -7,7 +7,7 @@
 (defn start_webhook
     ([token listen port url_path keystore pswd]
         (bot/remove_webhook token)
-        (let [listen_url (str "https://" listen ":" port "/" url_path)
+        (let [listen_url (str "https://" listen ":" port)
               c (async/chan)]
             (println (str "Listen: " listen_url))
             (bot/set_webhook token listen_url)

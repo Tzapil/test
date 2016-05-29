@@ -9,10 +9,12 @@
         (bot/remove_webhook token)
         (let [listen_url (str "https://" listen ":" port "/" url_path)
               c (async/chan)]
-            (print (str "Listen: " listen_url))
+            (println (str "Listen: " listen_url))
             (bot/set_webhook token listen_url)
             (async/go (server/start_server port keystore pswd 
                 (fn [request]
+                    (println "REQUEST")
+                    (println (str request))
                     (async/go (async/>! c request)))))
             c)))
 

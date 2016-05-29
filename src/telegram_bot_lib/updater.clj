@@ -14,9 +14,10 @@
             (bot/set_webhook token listen_url "cert.pem")
             (async/go (server/start_server port keystore pswd 
                 (fn [request]
-                    (println "REQUEST")
-                    (println (str (cheshire/parse-string (slurp (:body request)) true)))
-                    (async/go (async/>! c (cheshire/parse-string (slurp (:body request)) true))))))
+                    (let [json (cheshire/parse-string (slurp (:body request)) true)]
+                        (println "REQUEST")
+                        (println json)
+                        (async/go (async/>! c json))))))
             c)))
 
 (defn make_poll [token c offset limit timeout]

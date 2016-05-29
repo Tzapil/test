@@ -14,8 +14,8 @@
             (async/go (server/start_server port keystore pswd 
                 (fn [request]
                     (println "REQUEST")
-                    (println (str (:body request)))
-                    (async/go (async/>! c (:body request))))))
+                    (println (str (slurp (:body request))))
+                    (async/go (async/>! c (slurp (:body request)))))))
             c)))
 
 (defn make_poll [token c offset limit timeout]

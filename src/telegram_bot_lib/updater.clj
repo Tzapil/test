@@ -2,7 +2,8 @@
     (:require [clojure.core.async :as async]
               [telegram-bot-lib.bot :as bot]
               [telegram-bot-lib.helpers :as helpers]
-              [telegram-bot-lib.webserver :as server]))
+              [telegram-bot-lib.webserver :as server]
+              [cheshire.core :as cheshire]))
 
 (defn start_webhook
     ([token listen port url_path keystore pswd]
@@ -14,8 +15,8 @@
             (async/go (server/start_server port keystore pswd 
                 (fn [request]
                     (println "REQUEST")
-                    (println (str (helpers/body_json request)))
-                    (async/go (async/>! c (helpers/body_json request))))))
+                    (println (str (cheshire/parse-string (slurp (:body request)) true)))
+                    (async/go (async/>! c (cheshire/parse-string (slurp (:body request)) true))))))
             c)))
 
 (defn make_poll [token c offset limit timeout]

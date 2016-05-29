@@ -78,8 +78,7 @@
     ([token webhook_url certificate]
         (let [url (str base_url token "/setWebhook")
               data {:multipart [{:name "url" :content webhook_url}
-                                {:name "Content/type" :content "application/octet-stream"}
-                                {:name "certificate" :content (slurp certificate)}]}]
+                                {:name "certificate" :content (clojure.java.io/input-stream certificate)}]}]
                     (client/post url data))))
 
 (defn remove_webhook [token] 

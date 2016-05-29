@@ -17,7 +17,7 @@
                     (let [json (cheshire/parse-string (slurp (:body request)) true)]
                         (println "REQUEST")
                         (println json)
-                        (async/go (async/>! c json))))))
+                        (async/go (async/>! c [json]))))))
             c)))
 
 (defn make_poll [token c offset limit timeout]

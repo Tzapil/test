@@ -6,12 +6,12 @@
               [cheshire.core :as cheshire]))
 
 (defn start_webhook
-    ([token listen port url_path keystore pswd]
+    ([token listen port url_path certificate keystore pswd]
         (bot/remove_webhook token)
         (let [listen_url (str "https://" listen ":" port "/" url_path)
               c (async/chan)]
             (println (str "Listen: " listen_url))
-            (bot/set_webhook token listen_url "cert.pem")
+            (bot/set_webhook token listen_url certificate)
             (async/go (server/start_server port keystore pswd 
                 (fn [request]
                     (let [json (cheshire/parse-string (slurp (:body request)) true)]

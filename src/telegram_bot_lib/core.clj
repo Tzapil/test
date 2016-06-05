@@ -31,6 +31,11 @@
                     (async/<! (async/timeout t))
                     (bot/send_message bot-token id (str "Beep after " t " ms!")))))))
 
+(defn send_photo [data]
+    (let [id (get-in data [:message :chat :id])
+          text (get-in data [:message :text])]
+          (bot/send_photo bot-token id (clojure.java.io/input-stream "cirno_idle.gif") "Cirno")))
+
 (defn inline_handler [data]
     (println "INLINE: ")
     (let [id (get-in data [:inline_query :id])
@@ -46,6 +51,7 @@
     (handlers/create_command "start" #(bot/send_message bot-token (get-in % [:message :chat :id]) (str "HI! " emoji/WINKING_FACE)))
     (handlers/create_command "help" #(bot/send_message bot-token (get-in % [:message :chat :id]) "HELP!"))
     (handlers/create_command "set" timer)
+    (handlers/create_command "get" send_photo)
     (handlers/create_status_handler :new_chat_title #(bot/send_message bot-token (get-in % [:message :chat :id]) "WOW!"))
     (handlers/create_status_handler :left_chat_member #(bot/send_message bot-token (get-in % [:message :chat :id]) "WAIT!"))
     (handlers/create_inline_query_handler inline_handler)
@@ -59,5 +65,5 @@
   ;;(println (bot/send_message "***REMOVED***" 53941045 "kokoko"))
   ;;(updater/start_handlers h (updater/start_polling bot-token 100 1000 0))
   ;;(.addShutdownHook (Runtime/getRuntime) (Thread. (fn [] (println "Shutting down..."))))
-  (updater/start_handlers h (updater/start_webhook bot-token "***REMOVED***.tk" 8443 "hook" "cert.keystore" "***REMOVED***"))
+  (updater/start_handlers h (updater/start_webhook bot-token "***REMOVED***.tk" 8443 "hook" "cert.pem" "cert.keystore" "***REMOVED***"))
   (updater/idle))

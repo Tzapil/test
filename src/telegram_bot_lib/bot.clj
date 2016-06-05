@@ -110,7 +110,7 @@
         (send_photo token chat_id photo nil))
     ([token chat_id photo caption]
         (let [url (str base_url token "/sendPhoto")
-              data {:multipart [{:name "photo" :content photo :mime-type "image/gif"}
+              data {:multipart [{:name "photo" :file photo :mime-type "image/gif"}
                                 {:name "chat_id" :content chat_id}
                                 {:name "caption" :content caption}]}]
                     (client/post url data))))

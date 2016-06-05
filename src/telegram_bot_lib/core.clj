@@ -34,7 +34,7 @@
 (defn send_photo [data]
     (let [id (get-in data [:message :chat :id])
           text (get-in data [:message :text])]
-          (bot/send_photo bot-token id (clojure.java.io/input-stream "cirno_idle.gif") "Cirno")))
+          (bot/send_photo bot-token id (clojure.java.io/file "cirno_idle.gif") "Cirno")))
 
 (defn inline_handler [data]
     (println "INLINE: ")

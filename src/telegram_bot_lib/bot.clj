@@ -16,6 +16,23 @@
 (defn get_me [token] 
     (helpers/body_json (client/get (str base_url token "/getMe"))))
 
+(defn get_user_profile_photos 
+    ([token user_id]
+        (get_user_profile_photos token user_id 0 100))
+    ([token user_id offset]
+        (get_user_profile_photos token user_id offset 100))
+    ([token user_id offset limit]
+        (let [url (str base_url token "/getUserProfilePhotos")
+              data {:content-type :json
+                    :accept :json
+                    :query-params {
+                       :user_id user_id
+                       :offset offset
+                       :limit limit
+                   }
+                }]
+            (helpers/body_json (client/get url data)))))
+
 (defn send_message 
     ([token chat_id text]
         (send_message token chat_id text nil nil))

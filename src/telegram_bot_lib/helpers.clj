@@ -21,6 +21,9 @@
                 {name (map #(filter_hash %) value)}
                 {name value}))) hm))))
 
+(defn filter_multipart [m]
+    (filter #(not (nil? (:content %))) m))
+
 (defn parse_int [s]
    (Integer. (re-find  #"\d+" s)))
 

@@ -119,27 +119,61 @@
 ;; send_audio method
 (defmulti send_audio 
     (fn [token chat_id audio & others]
-        (type photo)))
+        (type audio)))
 
-;; photo = id of existed file
+;; audio = id of existed file
 (defmethod send_audio java.lang.String
     ([token chat_id audio]
-        (send_photo token chat_id audio nil))
-    ([token chat_id audio caption]
-        (let [url (str base_url token "/sendPhoto")
+        (send_audio token chat_id audio nil nil))
+    ([token chat_id audio title]
+        (send_audio token chat_id audio title nil))
+    ([token chat_id audio title performer]
+        (let [url (str base_url token "/sendAudio")
               data {:chat_id chat_id
                     :audio audio
+                    :title title
+                    :performer performer}]
+                    (message url data))))
+
+;; audio = java.io.File
+(defmethod send_audio java.io.File
+    ([token chat_id audio]
+        (send_audio token chat_id audio nil nil))
+    ([token chat_id audio title]
+        (send_audio token chat_id audio title nil))
+    ([token chat_id audio title performer]
+        (let [url (str base_url token "/sendAudio")
+              data {:multipart (helpers/filter_multipart 
+                                [{:name "chat_id" :content (str chat_id)}
+                                 {:name "title" :content title}
+                                 {:name "performer" :content performer}
+                                 {:name "audio" :content audio :filename (.getName audio)}])}]
+                    (client/post url data))))
+
+;; send_document method
+(defmulti send_document 
+    (fn [token chat_id document & others]
+        (type document)))
+
+;; document = id of existed file
+(defmethod send_document java.lang.String
+    ([token chat_id document]
+        (send_photo token chat_id document nil))
+    ([token chat_id document caption]
+        (let [url (str base_url token "/sendDocument")
+              data {:chat_id chat_id
+                    :document document
                     :caption caption}]
                     (message url data))))
 
-;; photo = java.io.File
-(defmethod send_audio java.io.File
-    ([token chat_id audio]
-        (send_photo token chat_id audio nil))
-    ([token chat_id audio caption]
-        (let [url (str base_url token "/sendPhoto")
+;; document = java.io.File
+(defmethod send_document java.io.File
+    ([token chat_id document]
+        (send_photo token chat_id document nil))
+    ([token chat_id document caption]
+        (let [url (str base_url token "/sendDocument")
               data {:multipart (helpers/filter_multipart 
                                 [{:name "chat_id" :content (str chat_id)}
                                  {:name "caption" :content caption}
-                                 {:name "audio" :content audio :filename (.getName audio)}])}]
+                                 {:name "audio" :content document :filename (.getName document)}])}]
                     (client/post url data))))

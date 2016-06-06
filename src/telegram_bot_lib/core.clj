@@ -32,9 +32,12 @@
                     (bot/send_message bot-token id (str "Beep after " t " ms!")))))))
 
 (defn send_photo [data]
-    (let [id (get-in data [:message :chat :id])
-          text (get-in data [:message :text])]
+    (let [id (get-in data [:message :chat :id])]
           (bot/send_photo bot-token id (clojure.java.io/file "touhou.jpg"))))
+
+(defn send_audio [data]
+    (let [id (get-in data [:message :chat :id])]
+          (bot/send_audio bot-token id (clojure.java.io/file "Radio Protector.mp3"))))
 
 (defn inline_handler [data]
     (println "INLINE: ")
@@ -52,6 +55,7 @@
     (handlers/create_command "help" #(bot/send_message bot-token (get-in % [:message :chat :id]) "HELP!"))
     (handlers/create_command "set" timer)
     (handlers/create_command "cirno" send_photo)
+    (handlers/create_command "song" send_audio)
     (handlers/create_status_handler :new_chat_title #(bot/send_message bot-token (get-in % [:message :chat :id]) "WOW!"))
     (handlers/create_status_handler :left_chat_member #(bot/send_message bot-token (get-in % [:message :chat :id]) "WAIT!"))
     (handlers/create_inline_query_handler inline_handler)

@@ -16,6 +16,11 @@
 (defn get_me [token] 
     (helpers/body_json (client/get (str base_url token "/getMe"))))
 
+(defn get_file [token file_id]
+    (let [url (str base_url token "/getFile")
+          data {:file_id file_id}]
+        (helpers/body_json (client/get url (assoc base-json :query-params data)))))
+
 (defn get_user_profile_photos 
     ([token user_id]
         (get_user_profile_photos token user_id 0 100))
@@ -23,15 +28,10 @@
         (get_user_profile_photos token user_id offset 100))
     ([token user_id offset limit]
         (let [url (str base_url token "/getUserProfilePhotos")
-              data {:content-type :json
-                    :accept :json
-                    :query-params {
-                       :user_id user_id
-                       :offset offset
-                       :limit limit
-                   }
-                }]
-            (helpers/body_json (client/get url data)))))
+              data {:user_id user_id
+                    :offset offset
+                    :limit limit}]
+            (helpers/body_json (client/get url (assoc base-json :query-params data))))))
 
 (defn send_message 
     ([token chat_id text]
@@ -71,6 +71,17 @@
                     :title title
                     :address address
                     :foursquare_id foursquare_id}]
+                    (message url data))))
+
+(defn send_contact 
+    ([token chat_id phone_number first_name]
+        (send_contact token chat_id phone_number first_name nil))
+    ([token chat_id phone_number first_name last_name] 
+        (let [url (str base_url token "/sendContact")
+              data {:chat_id chat_id
+                    :phone_number phone_number
+                    :first_name first_name
+                    :last_name last_name}]
                     (message url data))))
 
 (defn send_chat_action [token chat_id action] 

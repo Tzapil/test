@@ -110,7 +110,7 @@
                                  {:name "photo" :content photo :filename (.getName photo)}])}]
                     (client/post url data))))
 
-;; send_audio method
+;; send_audio method. mp3 files
 (defmulti send_audio 
     (fn [token chat_id audio & others]
         (type audio)))
@@ -221,3 +221,25 @@
                                  {:name "caption" :content caption}
                                  {:name "video" :content video :filename (.getName video)}])}]
                     (client/post url data))))
+
+;; send_voise method. ogg files
+(defmulti send_voise
+    (fn [token chat_id voise & others]
+        (type voise)))
+
+;; voise = id of existed file
+(defmethod send_voise java.lang.String
+    [token chat_id voise]
+        (let [url (str base_url token "/sendVoice")
+              data {:chat_id chat_id
+                    :voise voise}]
+                    (message url data)))
+
+;; voise = java.io.File
+(defmethod send_voise java.io.File
+    [token chat_id voise]
+        (let [url (str base_url token "/sendVoice")
+              data {:multipart (helpers/filter_multipart 
+                                [{:name "chat_id" :content (str chat_id)}
+                                 {:name "voise" :content voise :filename (.getName voise)}])}]
+                    (client/post url data)))

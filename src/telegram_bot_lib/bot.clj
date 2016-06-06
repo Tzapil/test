@@ -82,7 +82,7 @@
     ([token webhook_url certificate]
         (let [url (str base_url token "/setWebhook")
               data {:multipart [{:name "url" :content webhook_url}
-                                {:name "certificate" :content (clojure.java.io/input-stream certificate)}]}]
+                                {:name "certificate" :content (clojure.java.io/file certificate)}]}]
                     (client/post url data))))
 
 (defn remove_webhook [token] 
@@ -94,33 +94,52 @@
         (type photo)))
 
 ;; photo = id of existed file
-;;(defmethod send_photo java.lang.String
-;;    ([token chat_id photo]
-;;        (send_photo token chat_id photo nil))
-;;    ([token chat_id photo caption]
-;;        (let [url (str base_url token "/sendPhoto")
-;;              data {:chat_id chat_id
-;;                    :photo photo
-;;                    :caption caption}]
-;;                    (message url data))))
-
-;; photo = filestream
 (defmethod send_photo java.lang.String
     ([token chat_id photo]
         (send_photo token chat_id photo nil))
     ([token chat_id photo caption]
         (let [url (str base_url token "/sendPhoto")
-              data {:debug true
-                    :multipart [{:name "chat_id" :content (str chat_id)}
-                                {:name "caption" :content caption}
-                                {:name "photo" :content (clojure.java.io/file photo) :filename photo "Content-Type" "image/jpg"}]}]
+              data {:chat_id chat_id
+                    :photo photo
+                    :caption caption}]
+                    (message url data))))
+
+;; photo = java.io.File
+(defmethod send_photo java.io.File
+    ([token chat_id photo]
+        (send_photo token chat_id photo nil))
+    ([token chat_id photo caption]
+        (let [url (str base_url token "/sendPhoto")
+              data {:multipart (helpers/filter_multipart 
+                                [{:name "chat_id" :content (str chat_id)}
+                                 {:name "caption" :content caption}
+                                 {:name "photo" :content photo :filename (.getName photo)}])}]
                     (client/post url data))))
 
-;;(defn send_photo 
-;;    ([token chat_id photo]
-;;        (send_photo token chat_id photo nil))
-;;    ([token chat_id photo caption] 
-;;        (let [url (str base_url token "/sendPhoto")
-;;              data {:chat_id chat_id
-;;                    :photo photo}]
-;;                    (message url data))))
+;; send_audio method
+(defmulti send_audio 
+    (fn [token chat_id audio & others]
+        (type photo)))
+
+;; photo = id of existed file
+(defmethod send_audio java.lang.String
+    ([token chat_id audio]
+        (send_photo token chat_id audio nil))
+    ([token chat_id audio caption]
+        (let [url (str base_url token "/sendPhoto")
+              data {:chat_id chat_id
+                    :audio audio
+                    :caption caption}]
+                    (message url data))))
+
+;; photo = java.io.File
+(defmethod send_audio java.io.File
+    ([token chat_id audio]
+        (send_photo token chat_id audio nil))
+    ([token chat_id audio caption]
+        (let [url (str base_url token "/sendPhoto")
+              data {:multipart (helpers/filter_multipart 
+                                [{:name "chat_id" :content (str chat_id)}
+                                 {:name "caption" :content caption}
+                                 {:name "audio" :content audio :filename (.getName audio)}])}]
+                    (client/post url data))))

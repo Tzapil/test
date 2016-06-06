@@ -14,60 +14,64 @@
 (def bot-token "***REMOVED***")
 
 (defn echo [data]
-    (let [id (get-in data [:message :chat :id])
-          text (get-in data [:message :text])]
-          (println "ECHO_ANSWER: ")
-          (println id)
-          (println text)
-          (bot/send_message bot-token id text nil "Markdown")))
+  (let [id (get-in data [:message :chat :id])
+        text (get-in data [:message :text])]
+        (println "ECHO_ANSWER: ")
+        (println id)
+        (println text)
+        (bot/send_message bot-token id text nil "Markdown")))
 
 (defn timer [data]
-    (let [id (get-in data [:message :chat :id])
-          text (get-in data [:message :text])
-          args (handlers/parse_command_arguments text)]
-          (if (nil? (re-find  #"\d+" (first args)))
-              (bot/send_message bot-token id "Argument must be a number!")
-              (let [t (helpers/parse_int (first args))]
-                (async/go
-                    (async/<! (async/timeout t))
-                    (bot/send_message bot-token id (str "Beep after " t " ms!")))))))
+  (let [id (get-in data [:message :chat :id])
+        text (get-in data [:message :text])
+        args (handlers/parse_command_arguments text)]
+        (if (nil? (re-find  #"\d+" (first args)))
+            (bot/send_message bot-token id "Argument must be a number!")
+            (let [t (helpers/parse_int (first args))]
+              (async/go
+                  (async/<! (async/timeout t))
+                  (bot/send_message bot-token id (str "Beep after " t " ms!")))))))
 
 (defn send_photo [data]
-    (let [id (get-in data [:message :chat :id])]
-      (bot/send_photo bot-token id (clojure.java.io/file "touhou.jpg"))))
+  (let [id (get-in data [:message :chat :id])]
+    (bot/send_photo bot-token id (clojure.java.io/file "touhou.jpg"))))
 
 (defn send_audio [data]
-    (let [id (get-in data [:message :chat :id])]
-      (bot/send_chat_action bot-token id chat-action/upload_audio)
-      (bot/send_audio bot-token id (clojure.java.io/file "Radio Protector.mp3"))))
+  (let [id (get-in data [:message :chat :id])]
+    (bot/send_chat_action bot-token id chat-action/upload_audio)
+    (bot/send_audio bot-token id (clojure.java.io/file "Radio Protector.mp3"))))
 
 (defn send_document [data]
-    (let [id (get-in data [:message :chat :id])]
-      (bot/send_document bot-token id (clojure.java.io/file "LICENSE"))))
+  (let [id (get-in data [:message :chat :id])]
+    (bot/send_document bot-token id (clojure.java.io/file "LICENSE"))))
+
+(defn get_user [data]
+  (let [id (get-in data [:message :from :id])]
+    (println (bot/get_user_profile_photos bot-token id))))
 
 (defn inline_handler [data]
-    (println "INLINE: ")
-    (let [id (get-in data [:inline_query :id])
-          iq (get-in data [:inline_query :query])
-          results [
-            (inline/create_result_article "Caps" (string/upper-case iq))
-            (inline/create_result_article "Bold" (str "*" iq "*") nil "Markdown")
-            (inline/create_result_article "Italic" (str "_" iq "_") nil "Markdown")
-          ]]
-        (bot/answer_inline_query bot-token id results)))
+  (println "INLINE: ")
+  (let [id (get-in data [:inline_query :id])
+        iq (get-in data [:inline_query :query])
+        results [
+          (inline/create_result_article "Caps" (string/upper-case iq))
+          (inline/create_result_article "Bold" (str "*" iq "*") nil "Markdown")
+          (inline/create_result_article "Italic" (str "_" iq "_") nil "Markdown")
+        ]]
+      (bot/answer_inline_query bot-token id results)))
 
 (def h [
-    (handlers/create_command "start" #(bot/send_message bot-token (get-in % [:message :chat :id]) (str "HI! " emoji/WINKING_FACE)))
-    (handlers/create_command "help" #(bot/send_message bot-token (get-in % [:message :chat :id]) "HELP!"))
-    (handlers/create_command "set" timer)
-    (handlers/create_command "cirno" send_photo)
-    (handlers/create_command "song" send_audio)
-    (handlers/create_command "license" send_document)
-    (handlers/create_status_handler :new_chat_title #(bot/send_message bot-token (get-in % [:message :chat :id]) "WOW!"))
-    (handlers/create_status_handler :left_chat_member #(bot/send_message bot-token (get-in % [:message :chat :id]) "WAIT!"))
-    (handlers/create_inline_query_handler inline_handler)
-    ;;(handlers/create_handler filters/text echo)
-    ])
+  (handlers/create_command "start" #(bot/send_message bot-token (get-in % [:message :chat :id]) (str "HI! " emoji/WINKING_FACE)))
+  (handlers/create_command "help" #(bot/send_message bot-token (get-in % [:message :chat :id]) "HELP!"))
+  (handlers/create_command "set" timer)
+  (handlers/create_command "cirno" send_photo)
+  (handlers/create_command "song" send_audio)
+  (handlers/create_command "license" send_document)
+  (handlers/create_status_handler :new_chat_title #(bot/send_message bot-token (get-in % [:message :chat :id]) "WOW!"))
+  (handlers/create_status_handler :left_chat_member #(bot/send_message bot-token (get-in % [:message :chat :id]) "WAIT!"))
+  (handlers/create_inline_query_handler inline_handler)
+  (handlers/create_handler filters/text get_user)
+  ])
 
 (defn -main
   "I don't do a whole lot ... yet."

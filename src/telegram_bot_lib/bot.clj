@@ -193,3 +193,31 @@
                                 [{:name "chat_id" :content (str chat_id)}
                                  {:name "sticker" :content sticker :filename (.getName sticker)}])}]
                     (client/post url data)))
+
+;; send_video method
+(defmulti send_video
+    (fn [token chat_id video & others]
+        (type video)))
+
+;; video = id of existed file
+(defmethod send_video java.lang.String
+    ([token chat_id video]
+        (send_photo token chat_id video nil))
+    ([token chat_id video caption]
+        (let [url (str base_url token "/sendVideo")
+              data {:chat_id chat_id
+                    :video video
+                    :caption caption}]
+                    (message url data))))
+
+;; video = java.io.File
+(defmethod send_video java.io.File
+    ([token chat_id video]
+        (send_photo token chat_id video nil))
+    ([token chat_id video caption]
+        (let [url (str base_url token "/sendVideo")
+              data {:multipart (helpers/filter_multipart 
+                                [{:name "chat_id" :content (str chat_id)}
+                                 {:name "caption" :content caption}
+                                 {:name "video" :content video :filename (.getName video)}])}]
+                    (client/post url data))))

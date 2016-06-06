@@ -34,7 +34,7 @@
 (defn send_photo [data]
     (let [id (get-in data [:message :chat :id])
           text (get-in data [:message :text])]
-          (bot/send_photo bot-token id (clojure.java.io/input-stream "cirno_idle.gif") "Cirno")))
+          (bot/send_photo bot-token id "touhou.jpg" "Cirno.jpg")))
 
 (defn inline_handler [data]
     (println "INLINE: ")
@@ -63,7 +63,6 @@
   [& args]
   (println (bot/get_me bot-token))
   ;;(println (bot/send_message "***REMOVED***" 53941045 "kokoko"))
-  ;;(updater/start_handlers h (updater/start_polling bot-token 100 1000 0))
-  ;;(.addShutdownHook (Runtime/getRuntime) (Thread. (fn [] (println "Shutting down..."))))
-  (updater/start_handlers h (updater/start_webhook bot-token "***REMOVED***.tk" 8443 "hook" "cert.pem" "cert.keystore" "***REMOVED***"))
+  (updater/start_handlers h (updater/start_polling bot-token 100 1000 0))
+  ;;(updater/start_handlers h (updater/start_webhook bot-token "***REMOVED***.tk" 8443 "hook" "cert.pem" "cert.keystore" "***REMOVED***"))
   (updater/idle))

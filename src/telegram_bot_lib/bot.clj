@@ -94,32 +94,33 @@
         (type photo)))
 
 ;; photo = id of existed file
+;;(defmethod send_photo java.lang.String
+;;    ([token chat_id photo]
+;;        (send_photo token chat_id photo nil))
+;;    ([token chat_id photo caption]
+;;        (let [url (str base_url token "/sendPhoto")
+;;              data {:chat_id chat_id
+;;                    :photo photo
+;;                    :caption caption}]
+;;                    (message url data))))
+
+;; photo = filestream
 (defmethod send_photo java.lang.String
     ([token chat_id photo]
         (send_photo token chat_id photo nil))
     ([token chat_id photo caption]
         (let [url (str base_url token "/sendPhoto")
-              data {:chat_id chat_id
-                    :photo photo
-                    :caption caption}]
-                    (message url data))))
-
-;; photo = filestream
-(defmethod send_photo java.io.BufferedInputStream
-    ([token chat_id photo]
-        (send_photo token chat_id photo nil))
-    ([token chat_id photo caption]
-        (let [url (str base_url token "/sendPhoto")
-              data {:multipart [{:name "photo" :file photo :mime-type "image/gif"}
-                                {:name "chat_id" :content chat_id}
-                                {:name "caption" :content caption}]}]
+              data {:debug true
+                    :multipart [{:name "chat_id" :content (str chat_id)}
+                                {:name "caption" :content caption}
+                                {:name "photo" :content (clojure.java.io/file photo) :filename photo "Content-Type" "image/jpg"}]}]
                     (client/post url data))))
 
-(defn send_photo 
-    ([token chat_id photo]
-        (send_photo token chat_id photo nil))
-    ([token chat_id photo caption] 
-        (let [url (str base_url token "/sendPhoto")
-              data {:chat_id chat_id
-                    :photo photo}]
-                    (message url data))))
+;;(defn send_photo 
+;;    ([token chat_id photo]
+;;        (send_photo token chat_id photo nil))
+;;    ([token chat_id photo caption] 
+;;        (let [url (str base_url token "/sendPhoto")
+;;              data {:chat_id chat_id
+;;                    :photo photo}]
+;;                    (message url data))))

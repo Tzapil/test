@@ -21,6 +21,27 @@
           data {:file_id file_id}]
         (helpers/body_json (client/get url (assoc base-json :query-params data)))))
 
+(defn get_chat [token chat_id] 
+    (let [url (str base_url token "/getChat")
+          data {:chat_id chat_id}]
+                (helpers/body_json (client/get url (assoc base-json :query-params data)))))
+
+(defn get_chat_administrators [token chat_id] 
+    (let [url (str base_url token "/getChatAdministrators")
+          data {:chat_id chat_id}]
+                (helpers/body_json (client/get url (assoc base-json :query-params data)))))
+
+(defn get_chat_members_count [token chat_id] 
+    (let [url (str base_url token "/getChatMembersCount")
+          data {:chat_id chat_id}]
+                (helpers/body_json (client/get url (assoc base-json :query-params data)))))
+
+(defn get_chat_member [token chat_id user_id] 
+    (let [url (str base_url token "/getChatMember")
+          data {:chat_id chat_id
+                :user_id user_id}]
+                (helpers/body_json (client/get url (assoc base-json :query-params data)))))
+
 (defn get_user_profile_photos 
     ([token user_id]
         (get_user_profile_photos token user_id 0 100))
@@ -88,6 +109,23 @@
     (let [url (str base_url token "/sendChatAction")
           data {:chat_id chat_id
                 :action action}]
+                (message url data)))
+
+(defn kick_chat_member [token chat_id user_id] 
+    (let [url (str base_url token "/kickChatMember")
+          data {:chat_id chat_id
+                :user_id user_id}]
+                (message url data)))
+
+(defn unban_chat_member [token chat_id user_id] 
+    (let [url (str base_url token "/unbanChatMember")
+          data {:chat_id chat_id
+                :user_id user_id}]
+                (message url data)))
+
+(defn leave_chat [token chat_id] 
+    (let [url (str base_url token "/leaveChat")
+          data {:chat_id chat_id}]
                 (message url data)))
 
 (defn get_updates 

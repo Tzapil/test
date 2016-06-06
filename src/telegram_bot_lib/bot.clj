@@ -37,11 +37,24 @@
                 (message url data)))
 
 (defn send_location [token chat_id latitude longitude] 
-    (let [url (str base_url token "/sendSticker")
+    (let [url (str base_url token "/sendLocation")
           data {:chat_id chat_id
                 :latitude latitude
                 :longitude longitude}]
                 (message url data)))
+
+(defn send_venue 
+    ([token chat_id latitude longitude title address]
+        (send_venue token chat_id latitude longitude title address nil))
+    ([token chat_id latitude longitude title address foursquare_id] 
+        (let [url (str base_url token "/sendVenue")
+              data {:chat_id chat_id
+                    :latitude latitude
+                    :longitude longitude
+                    :title title
+                    :address address
+                    :foursquare_id foursquare_id}]
+                    (message url data))))
 
 (defn send_chat_action [token chat_id action] 
     (let [url (str base_url token "/sendChatAction")

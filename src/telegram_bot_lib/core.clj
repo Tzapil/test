@@ -6,6 +6,7 @@
             [telegram-bot-lib.handlers :as handlers]
             [telegram-bot-lib.filters :as filters]
             [telegram-bot-lib.inline :as inline]
+            [telegram-bot-lib.chat-action :as chat-action]
             [clojure.string :as string]
             [telegram-bot-lib.emoji :as emoji])
   (:gen-class))
@@ -33,15 +34,16 @@
 
 (defn send_photo [data]
     (let [id (get-in data [:message :chat :id])]
-          (bot/send_photo bot-token id (clojure.java.io/file "touhou.jpg"))))
+      (bot/send_photo bot-token id (clojure.java.io/file "touhou.jpg"))))
 
 (defn send_audio [data]
     (let [id (get-in data [:message :chat :id])]
-          (bot/send_audio bot-token id (clojure.java.io/file "Radio Protector.mp3"))))
+      (bot/send_chat_action bot-token id chat-action/upload_audio)
+      (bot/send_audio bot-token id (clojure.java.io/file "Radio Protector.mp3"))))
 
 (defn send_document [data]
     (let [id (get-in data [:message :chat :id])]
-          (bot/send_document bot-token id (clojure.java.io/file "LICENSE"))))
+      (bot/send_document bot-token id (clojure.java.io/file "LICENSE"))))
 
 (defn inline_handler [data]
     (println "INLINE: ")

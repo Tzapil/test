@@ -147,6 +147,18 @@
                 :results results}]
                 (message url data)))
 
+(defn answer_callback_query 
+    ([token callback_query_id]
+        (answer_callback_query token callback_query_id nil false))
+    ([token callback_query_id text]
+        (answer_callback_query token callback_query_id text false))
+    ([token callback_query_id text show_alert] 
+        (let [url (str base_url token "/answerCallbackQuery")
+              data {:callback_query_id callback_query_id
+                    :text text
+                    :show_alert show_alert}]
+                    (message url data))))
+
 (defn set_webhook
     ([token webhook_url]
         (let [url (str base_url token "/setWebhook")

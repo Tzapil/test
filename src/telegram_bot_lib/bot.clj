@@ -175,5 +175,5 @@
               data {:multipart (helpers/filter_multipart 
                                 [{:name "chat_id" :content (str chat_id)}
                                  {:name "caption" :content caption}
-                                 {:name "audio" :content document :filename (.getName document)}])}]
+                                 {:name "document" :content document :filename (.getName document)}])}]
                     (client/post url data))))

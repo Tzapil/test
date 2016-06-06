@@ -39,6 +39,10 @@
     (let [id (get-in data [:message :chat :id])]
           (bot/send_audio bot-token id (clojure.java.io/file "Radio Protector.mp3"))))
 
+(defn send_document [data]
+    (let [id (get-in data [:message :chat :id])]
+          (bot/send_document bot-token id (clojure.java.io/file "LICENSE"))))
+
 (defn inline_handler [data]
     (println "INLINE: ")
     (let [id (get-in data [:inline_query :id])
@@ -56,6 +60,7 @@
     (handlers/create_command "set" timer)
     (handlers/create_command "cirno" send_photo)
     (handlers/create_command "song" send_audio)
+    (handlers/create_command "license" send_document)
     (handlers/create_status_handler :new_chat_title #(bot/send_message bot-token (get-in % [:message :chat :id]) "WOW!"))
     (handlers/create_status_handler :left_chat_member #(bot/send_message bot-token (get-in % [:message :chat :id]) "WAIT!"))
     (handlers/create_inline_query_handler inline_handler)

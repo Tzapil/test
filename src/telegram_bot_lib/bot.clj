@@ -36,12 +36,6 @@
                 :message_id message_id}]
                 (message url data)))
 
-(defn send_sticker [token chat_id sticker] 
-    (let [url (str base_url token "/sendSticker")
-          data {:chat_id chat_id
-                :sticker sticker}]
-                (message url data)))
-
 (defn send_location [token chat_id latitude longitude] 
     (let [url (str base_url token "/sendSticker")
           data {:chat_id chat_id
@@ -177,3 +171,25 @@
                                  {:name "caption" :content caption}
                                  {:name "document" :content document :filename (.getName document)}])}]
                     (client/post url data))))
+
+;; send_sticker method
+(defmulti send_sticker 
+    (fn [token chat_id sticker]
+        (type sticker)))
+
+;; sticker = id of existed file webp
+(defmethod send_sticker java.lang.String
+    [token chat_id sticker]
+        (let [url (str base_url token "/sendSticker")
+              data {:chat_id chat_id
+                    :sticker sticker}]
+                    (message url data)))
+
+;; sticker = java.io.File
+(defmethod send_sticker java.io.File
+    [token chat_id sticker]
+        (let [url (str base_url token "/sendSticker")
+              data {:multipart (helpers/filter_multipart 
+                                [{:name "chat_id" :content (str chat_id)}
+                                 {:name "sticker" :content sticker :filename (.getName sticker)}])}]
+                    (client/post url data)))

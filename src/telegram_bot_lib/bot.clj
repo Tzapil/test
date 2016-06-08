@@ -313,24 +313,24 @@
                                  {:name "video" :content video :filename (.getName video)}])}]
                     (client/post url data))))
 
-;; send_voise method. ogg files
-(defmulti send_voise
-    (fn [token chat_id voise & others]
-        (type voise)))
+;; send_voice method. ogg files
+(defmulti send_voice
+    (fn [token chat_id voice & others]
+        (type voice)))
 
-;; voise = id of existed file
-(defmethod send_voise java.lang.String
-    [token chat_id voise]
+;; voice = id of existed file
+(defmethod send_voice java.lang.String
+    [token chat_id voice]
         (let [url (str base_url token "/sendVoice")
               data {:chat_id chat_id
-                    :voise voise}]
+                    :voice voice}]
                     (message url data)))
 
-;; voise = java.io.File
-(defmethod send_voise java.io.File
-    [token chat_id voise]
+;; voice = java.io.File
+(defmethod send_voice java.io.File
+    [token chat_id voice]
         (let [url (str base_url token "/sendVoice")
               data {:multipart (helpers/filter_multipart 
                                 [{:name "chat_id" :content (str chat_id)}
-                                 {:name "voise" :content voise :filename (.getName voise)}])}]
+                                 {:name "voice" :content voice :filename (.getName voice)}])}]
                     (client/post url data)))

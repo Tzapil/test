@@ -117,6 +117,20 @@
             :description description
         }))
 
+(defn create_result_venue
+    ([latitude longitude title address]
+        (create_result_venue latitude longitude title address nil))
+    ([latitude longitude title address foursquare_id]
+        {
+            :type "location"
+            :id (helpers/uuid)
+            :title title
+            :latitude latitude
+            :longitude longitude
+            :address address
+            :foursquare_id foursquare_id
+        }))
+
 (defn create_result_location
     [latitude longitude title]
         {
@@ -129,19 +143,28 @@
 
 (defn create_result_contact
     ([phone_number first_name]
-        (create_result_contact phone_number first_name nil nil))
-    ([phone_number first_name message_text]
-        (create_result_contact phone_number first_name message_text nil))
-    ([phone_number first_name message_text parse_mode]
+        (create_result_contact phone_number first_name nil))
+    ([phone_number first_name last_name]
         {
             :type "contact"
             :id (helpers/uuid)
             :phone_number phone_number
             :first_name first_name
-            :input_message_content {
-                :message_text message_text
-                :parse_mode parse_mode       
-            }
+            :last_name last_name
+        }))
+
+(defn create_result_cached_photo
+    ([audio_file_id]
+        (create_result_cached_audio audio_file_id nil nil))
+    ([audio_file_id]
+        (create_result_cached_audio audio_file_id message_text nil))
+    ([audio_file_id title description caption]
+        {
+            :type "audio"
+            :id (helpers/uuid)
+            :audio_file_id audio_file_id
+            :title title
+            :description description
         }))
 
 (defn create_result_cached_audio

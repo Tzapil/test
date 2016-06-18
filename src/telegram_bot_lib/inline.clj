@@ -154,31 +154,99 @@
         }))
 
 (defn create_result_cached_photo
-    ([audio_file_id]
-        (create_result_cached_audio audio_file_id nil nil))
-    ([audio_file_id]
-        (create_result_cached_audio audio_file_id message_text nil))
-    ([audio_file_id title description caption]
+    ([photo_file_id]
+        (create_result_cached_photo photo_file_id nil nil nil))
+    ([photo_file_id title]
+        (create_result_cached_photo photo_file_id title nil nil))
+    ([photo_file_id title description]
+        (create_result_cached_photo photo_file_id title description nil))
+    ([photo_file_id title description caption]
         {
-            :type "audio"
+            :type "photo"
             :id (helpers/uuid)
-            :audio_file_id audio_file_id
+            :photo_file_id photo_file_id
             :title title
             :description description
+            :caption caption
         }))
 
-(defn create_result_cached_audio
-    ([audio_file_id]
-        (create_result_cached_audio audio_file_id nil nil))
-    ([audio_file_id message_text]
-        (create_result_cached_audio audio_file_id message_text nil))
-    ([audio_file_id message_text parse_mode]
+(defn create_result_cached_gif
+    ([gif_file_id]
+        (create_result_cached_gif gif_file_id nil nil))
+    ([gif_file_id title]
+        (create_result_cached_gif gif_file_id title nil))
+    ([gif_file_id title caption]
+        {
+            :type "gif"
+            :id (helpers/uuid)
+            :gif_file_id gif_file_id
+            :title title
+            :caption caption
+        }))
+
+(defn create_result_cached_mpeg4_gif
+    ([mpeg4_file_id]
+        (create_result_cached_mpeg4_gif mpeg4_file_id nil nil))
+    ([mpeg4_file_id title]
+        (create_result_cached_mpeg4_gif mpeg4_file_id title nil))
+    ([mpeg4_file_id title caption]
+        {
+            :type "mpeg4_gif"
+            :id (helpers/uuid)
+            :mpeg4_file_id mpeg4_file_id
+            :title title
+            :caption caption
+        }))
+
+(defn create_result_cached_sticker
+    [sticker_file_id]
+        {
+            :type "sticker"
+            :id (helpers/uuid)
+            :sticker_file_id sticker_file_id
+        })
+
+(defn create_result_cached_document
+    ([document_file_id title]
+        (create_result_cached_document document_file_id title nil nil))
+    ([document_file_id title description]
+        (create_result_cached_document document_file_id title description nil))
+    ([document_file_id title description caption]
+        {
+            :type "document"
+            :id (helpers/uuid)
+            :document_file_id document_file_id
+            :title title
+            :description description
+            :caption caption
+        }))
+
+(defn create_result_cached_video
+    ([video_file_id title]
+        (create_result_cached_video video_file_id title nil nil))
+    ([video_file_id title description]
+        (create_result_cached_video video_file_id title description nil))
+    ([video_file_id title description caption]
+        {
+            :type "video"
+            :id (helpers/uuid)
+            :video_file_id video_file_id
+            :title title
+            :description description
+            :caption caption
+        }))
+
+(defn create_result_cached_voice [voice_file_id title]
+        {
+            :type "voice"
+            :id (helpers/uuid)
+            :voice_file_id voice_file_id
+            :title title
+        })
+
+(defn create_result_cached_audio [audio_file_id]
         {
             :type "audio"
             :id (helpers/uuid)
             :audio_file_id audio_file_id
-            :input_message_content {
-                :message_text message_text
-                :parse_mode parse_mode       
-            }
-        }))
+        })

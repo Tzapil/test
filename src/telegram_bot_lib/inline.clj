@@ -50,7 +50,7 @@
 
 (defn create_result_mpeg4_gif
     ([mpeg4_url thumb_url]
-        (create_result_mpeg4_gif mpeg4_url thumb_url title nil nil))
+        (create_result_mpeg4_gif mpeg4_url thumb_url nil nil))
     ([mpeg4_url thumb_url title]
         (create_result_mpeg4_gif mpeg4_url thumb_url title nil))
     ([mpeg4_url thumb_url title caption]

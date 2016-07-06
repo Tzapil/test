@@ -8,7 +8,8 @@
                  [cheshire "5.5.0"]
                  [org.clojure/core.async "0.2.374"]
                  [ring/ring-core "1.5.0-RC1"]
-                 [ring/ring-jetty-adapter "1.5.0-RC1"]]
+                 [ring/ring-jetty-adapter "1.5.0-RC1"]
+                 [org.clojure/data.zip "0.1.2"]]
   :main ^:skip-aot telegram-bot-lib.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})

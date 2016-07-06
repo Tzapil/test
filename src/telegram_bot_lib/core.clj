@@ -1,5 +1,9 @@
 (ns telegram-bot-lib.core
   (:require [clojure.core.async :as async]
+            [clj-http.client :as client]
+            [clojure.xml :as xml]
+            [clojure.zip :as zip]
+            [clojure.data.zip.xml :as navigation]
             [telegram-bot-lib.bot :as bot]
             [telegram-bot-lib.helpers :as helpers]
             [telegram-bot-lib.updater :as updater]
@@ -12,6 +16,13 @@
   (:gen-class))
 
 (def bot-token "***REMOVED***")
+
+(def myanimelist-search-api "http://myanimelist.net/api/anime/search.xml")
+(def myanimelist-auth ["***REMOVED***" "***REMOVED***"])
+
+(defn zip-str [s]
+  (zip/xml-zip 
+      (xml/parse (java.io.ByteArrayInputStream. (.getBytes s)))))
 
 (defn echo [data]
   (let [id (get-in data [:message :chat :id])
@@ -53,12 +64,28 @@
   (println "INLINE: ")
   (let [id (get-in data [:inline_query :id])
         iq (get-in data [:inline_query :query])
+        req (string/split iq #" ")
+        query (first req)
+        anime (apply str (rest req))
         results [
           (inline/create_result_article "Caps" (string/upper-case iq))
           (inline/create_result_article "Bold" (str "*" iq "*") nil "Markdown")
           (inline/create_result_article "Italic" (str "_" iq "_") nil "Markdown")
         ]]
-      (bot/answer_inline_query bot-token id results)))
+        (println req)
+        (if (and (= query "search") (> (count anime) 0))
+          (let [answer (client/get myanimelist-search-api 
+                              {:query-params {:q anime}
+                               :basic-auth myanimelist-auth})
+                body (zip-str (:body answer))
+                r (navigation/xml-> body
+                   :anime
+                   :entry
+                   :title
+                   navigation/text)]
+                (println (vec r))
+                (if (not (nil? body))
+                    (bot/answer_inline_query bot-token id (vec (map #(inline/create_result_article % %) r)))))))) ;; (bot/answer_inline_query bot-token id results) [(inline/create_result_article "Anime" (first r))]
 
 (def h [
   (handlers/create_command "start" #(bot/send_message bot-token (get-in % [:message :chat :id]) (str "HI! " emoji/WINKING_FACE)))
@@ -77,6 +104,9 @@
   "I don't do a whole lot ... yet."
   [& args]
   (println (bot/get_me bot-token))
+  (let [r (client/get myanimelist-search-api {:query-params {:q "full metal asd asd asd adas asd asd"}
+                                                                     :basic-auth myanimelist-auth})]
+    (println (:body r)))
   ;;(println (bot/send_message "***REMOVED***" 53941045 "kokoko"))
   (updater/start_handlers h (updater/start_polling bot-token 100 1000 0))
   ;;(updater/start_handlers h (updater/start_webhook bot-token "***REMOVED***.tk" 8443 "hook" "cert.pem" "cert.keystore" "***REMOVED***"))

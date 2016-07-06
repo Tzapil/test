@@ -60,6 +60,22 @@
   (let [id (get-in data [:message :from :id])]
     (println (bot/get_user_profile_photos bot-token id))))
 
+(defn get_anime_title [anime]
+  (first (navigation/xml-> anime
+        :title
+        navigation/text)))
+
+(defn get_anime_image [anime]
+  (first (navigation/xml-> anime
+        :image
+        navigation/text)))
+
+(defn create_inline_query [body]  
+  (let [anime (navigation/xml-> body
+                   :anime
+                   :entry)]
+        (vec (map #(inline/create_result_article (get_anime_title %) (get_anime_image %)) anime))))
+
 (defn inline_handler [data]
   (println "INLINE: ")
   (let [id (get-in data [:inline_query :id])
@@ -78,14 +94,10 @@
                               {:query-params {:q anime}
                                :basic-auth myanimelist-auth})
                 body (zip-str (:body answer))
-                r (navigation/xml-> body
-                   :anime
-                   :entry
-                   :title
-                   navigation/text)]
-                (println (vec r))
+                r (create_inline_query body)]
+                (println r)
                 (if (not (nil? body))
-                    (bot/answer_inline_query bot-token id (vec (map #(inline/create_result_article % %) r)))))))) ;; (bot/answer_inline_query bot-token id results) [(inline/create_result_article "Anime" (first r))]
+                    (bot/answer_inline_query bot-token id r)))))) ;; (bot/answer_inline_query bot-token id results) [(inline/create_result_article "Anime" (first r))]
 
 (def h [
   (handlers/create_command "start" #(bot/send_message bot-token (get-in % [:message :chat :id]) (str "HI! " emoji/WINKING_FACE)))

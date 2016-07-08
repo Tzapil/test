@@ -20,6 +20,25 @@
 (def myanimelist-search-api "http://myanimelist.net/api/anime/search.xml")
 (def myanimelist-auth ["***REMOVED***" "***REMOVED***"])
 
+(defn read-users
+  ([]
+    (read-users "./users.txt"))
+  ([file]
+    (if (.exists (as-file file))
+        (clojure.java.io/with-open [rdr (clojure.java.io/reader file)]
+          (for [line (line-seq rdr)]
+            (string/split line #" ")))
+        [])))
+
+(defn write-users
+  ([users]
+    (write-users users "./users.txt"))
+  ([users file]
+    (clojure.java.io/with-open [wrtr (clojure.java.io/writer file)]
+          (doseq [user users]
+            (.write wrtr (string/join " " user))))
+    users))
+
 (defn zip-str [s]
   (zip/xml-zip 
       (xml/parse (java.io.ByteArrayInputStream. (.getBytes s)))))

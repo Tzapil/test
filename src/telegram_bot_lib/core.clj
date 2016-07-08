@@ -4,15 +4,15 @@
             [clojure.xml :as xml]
             [clojure.zip :as zip]
             [clojure.data.zip.xml :as navigation]
-            [telegram-bot-lib.bot :as bot]
-            [telegram-bot-lib.helpers :as helpers]
-            [telegram-bot-lib.updater :as updater]
-            [telegram-bot-lib.handlers :as handlers]
-            [telegram-bot-lib.filters :as filters]
-            [telegram-bot-lib.inline :as inline]
-            [telegram-bot-lib.chat-action :as chat-action]
+            [tblibrary.bot :as bot]
+            [tblibrary.helpers :as helpers]
+            [tblibrary.updater :as updater]
+            [tblibrary.handlers :as handlers]
+            [tblibrary.filters :as filters]
+            [tblibrary.inline :as inline]
+            [tblibrary.chat-action :as chat-action]
             [clojure.string :as string]
-            [telegram-bot-lib.emoji :as emoji])
+            [tblibrary.emoji :as emoji])
   (:gen-class))
 
 (def bot-token "***REMOVED***")
@@ -79,25 +79,14 @@
 (defn inline_handler [data]
   (println "INLINE: ")
   (let [id (get-in data [:inline_query :id])
-        iq (get-in data [:inline_query :query])
-        req (string/split iq #" ")
-        query (first req)
-        anime (apply str (rest req))
-        results [
-          (inline/create_result_article "Caps" (string/upper-case iq))
-          (inline/create_result_article "Bold" (str "*" iq "*") nil "Markdown")
-          (inline/create_result_article "Italic" (str "_" iq "_") nil "Markdown")
-        ]]
-        (println req)
-        (if (and (= query "search") (> (count anime) 0))
-          (let [answer (client/get myanimelist-search-api 
-                              {:query-params {:q anime}
-                               :basic-auth myanimelist-auth})
-                body (zip-str (:body answer))
-                r (create_inline_query body)]
-                (println r)
-                (if (not (nil? body))
-                    (bot/answer_inline_query bot-token id r)))))) ;; (bot/answer_inline_query bot-token id results) [(inline/create_result_article "Anime" (first r))]
+        iq (get-in data [:inline_query :query])]
+        (let [answer (client/get myanimelist-search-api 
+                            {:query-params {:q iq}
+                             :basic-auth myanimelist-auth})
+              body (zip-str (:body answer))
+              r (create_inline_query body)]
+              (if (not (nil? body))
+                  (bot/answer_inline_query bot-token id r))))) ;; (bot/answer_inline_query bot-token id results) [(inline/create_result_article "Anime" (first r))]
 
 (def h [
   (handlers/create_command "start" #(bot/send_message bot-token (get-in % [:message :chat :id]) (str "HI! " emoji/WINKING_FACE)))

@@ -24,8 +24,8 @@
   ([]
     (read-users "./users.txt"))
   ([file]
-    (if (.exists (as-file file))
-        (clojure.java.io/with-open [rdr (clojure.java.io/reader file)]
+    (if (.exists (clojure.java.io/as-file file))
+        (with-open [rdr (clojure.java.io/reader file)]
           (for [line (line-seq rdr)]
             (string/split line #" ")))
         [])))
@@ -34,7 +34,7 @@
   ([users]
     (write-users users "./users.txt"))
   ([users file]
-    (clojure.java.io/with-open [wrtr (clojure.java.io/writer file)]
+    (with-open [wrtr (clojure.java.io/writer file)]
           (doseq [user users]
             (.write wrtr (string/join " " user))))
     users))

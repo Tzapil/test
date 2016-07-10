@@ -18,30 +18,80 @@
 (def bot-token "***REMOVED***")
 
 (def myanimelist-search-api "http://myanimelist.net/api/anime/search.xml")
+(def myanimelist-get-list-api "http://myanimelist.net/malappinfo.php") ;;?u=domokun1134&status=all&type=anime
 (def myanimelist-auth ["***REMOVED***" "***REMOVED***"])
+(def default-user ["1" "***REMOVED***" "***REMOVED***"])
 
-(defn read-users
-  ([]
-    (read-users "./users.txt"))
-  ([file]
-    (if (.exists (clojure.java.io/as-file file))
-        (with-open [rdr (clojure.java.io/reader file)]
-          (for [line (line-seq rdr)]
-            (string/split line #" ")))
-        [])))
+(def users-file "./users.txt")
+(def ^:dynamic users [])
+(def ^:dynamic states [])
 
-(defn write-users
-  ([users]
-    (write-users users "./users.txt"))
-  ([users file]
-    (with-open [wrtr (clojure.java.io/writer file)]
-          (doseq [user users]
-            (.write wrtr (string/join " " user))))
-    users))
+(defn third [a]
+    (get a 2))
 
 (defn zip-str [s]
   (zip/xml-zip 
       (xml/parse (java.io.ByteArrayInputStream. (.getBytes s)))))
+
+(defn read-users [file]
+    (if (.exists (clojure.java.io/as-file file))
+        (with-open [rdr (clojure.java.io/reader file)]
+          (for [line (line-seq rdr)]
+            (string/split line #" ")))
+        []))
+
+(defn write-users [users file]
+    (with-open [wrtr (clojure.java.io/writer file)]
+          (doseq [user users]
+            (.write wrtr (string/join " " user))))
+    users)
+
+(defn get-user [user users]
+    (some #(and (= (first %) user) %) users))
+
+(defn get-tag-text [container tag]
+    (first (navigation/xml-> container
+        tag
+        navigation/text)))
+
+(defn anime-status [id]
+    (let [statuses ["unknown" "watching" "completed" "on-hold" "dropped" "unknown" "plan-to-watch"]]
+        (get statuses (helpers/parse_int id))))
+
+(defn serialize-anime [anm]
+     (let [name (first anm)
+              episodes (second anm)
+              watching (third anm)
+              status (get anm 3)
+              score (get anm 4)
+              image (get anm 5)]
+              (println status " " (anime-status status))
+          (str "<b>" name "</b> " watching "/" episodes "\n Status: " (anime-status status) "\nScore: " score "\n" image)))
+
+(defn serialize-anime-list [anm-lst]
+    (let [result (reduce (fn [accum ent] 
+        (let [name (first ent)
+              episodes (second ent)
+              watching (third ent)
+              status (get ent 3)
+              score (get ent 4)]
+          (println status " " (anime-status status))
+          (str accum "<b>" name "</b> " watching "/" episodes " status: " (anime-status status) " score: " score "\n" ))) "" anm-lst)]
+    (println result)
+    result))
+
+(defn anime-list [user]
+    (let [user-id (second user)
+          answer (client/get myanimelist-get-list-api
+                            {:query-params {:u user-id
+                                            :status "all"
+                                            :type "anime"}})
+          body (zip-str (:body answer))
+          entries (navigation/xml-> body
+                  :myanimelist
+                  :anime)
+          anm-lst (vec (map (fn [entry] (vec (map #(get-tag-text entry %) [:series_title :series_episodes :my_watched_episodes :my_status :my_score :series_image]))) entries))]
+            anm-lst))
 
 (defn echo [data]
   (let [id (get-in data [:message :chat :id])
@@ -114,6 +164,7 @@
   (handlers/create_command "cirno" send_photo)
   (handlers/create_command "song" send_audio)
   (handlers/create_command "license" send_document)
+  (handlers/create_command "list" #(bot/send_message bot-token (get-in % [:message :chat :id]) (serialize-anime-list (take 10 (anime-list default-user))) nil "HTML"))
   (handlers/create_status_handler :new_chat_title #(bot/send_message bot-token (get-in % [:message :chat :id]) "WOW!"))
   (handlers/create_status_handler :left_chat_member #(bot/send_message bot-token (get-in % [:message :chat :id]) "WAIT!"))
   (handlers/create_inline_query_handler inline_handler)
@@ -124,6 +175,7 @@
   "I don't do a whole lot ... yet."
   [& args]
   (println (bot/get_me bot-token))
+  (alter-var-root #'users (fn [v] (read-users users-file)))
   (let [r (client/get myanimelist-search-api {:query-params {:q "full metal asd asd asd adas asd asd"}
                                                                      :basic-auth myanimelist-auth})]
     (println (:body r)))

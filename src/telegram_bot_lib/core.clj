@@ -30,8 +30,13 @@
     (get a 2))
 
 (defn zip-str [s]
+    ;;(-> s xml/parse zip/xml-zip))
   (zip/xml-zip 
-      (xml/parse (java.io.ByteArrayInputStream. (.getBytes s)))))
+    (let [input_stream (java.io.ByteArrayInputStream. (.getBytes s))
+          input_reader (java.io.InputStreamReader. input_stream "UTF-8")
+          input_source (org.xml.sax.InputSource. input_reader)]
+        (.setEncoding input_source "UTF-8")
+        (xml/parse input_source))))
 
 (defn read-users [file]
     (if (.exists (clojure.java.io/as-file file))
@@ -66,7 +71,7 @@
               score (get anm 4)
               image (get anm 5)]
               (println status " " (anime-status status))
-          (str "<b>" name "</b> " watching "/" episodes "\n Status: " (anime-status status) "\nScore: " score "\n" image)))
+          (str "<b>" name "</b> " watching "/" episodes "\nStatus: " (anime-status status) "\nScore: " score "\n" image)))
 
 (defn serialize-anime-list [anm-lst]
     (let [result (reduce (fn [accum ent] 
@@ -146,16 +151,22 @@
         (vec (map #(inline/create_result_article (get_anime_title %) (get_anime_image %)) anime))))
 
 (defn inline_handler [data]
-  (println "INLINE: ")
   (let [id (get-in data [:inline_query :id])
-        iq (get-in data [:inline_query :query])]
-        (let [answer (client/get myanimelist-search-api 
-                            {:query-params {:q iq}
-                             :basic-auth myanimelist-auth})
-              body (zip-str (:body answer))
-              r (create_inline_query body)]
-              (if (not (nil? body))
-                  (bot/answer_inline_query bot-token id r))))) ;; (bot/answer_inline_query bot-token id results) [(inline/create_result_article "Anime" (first r))]
+        iq (get-in data [:inline_query :query])
+        request (string/split iq #" ")
+        user_name (first request)
+        anime_arr (rest request)]
+        (println "USER")
+        (println user_name)
+        (if (not (nil? user_name))
+            (let [anime_name (string/lower-case (string/join " " anime_arr))
+                  answer (take 10 (filter #(string/includes? (string/lower-case (first %)) anime_name) (anime-list [nil user_name nil])))
+                  r (map #(inline/create_result_article (first %) (str "User: " user_name "\n" (serialize-anime %)) "" "HTML") answer)]
+                    (println "RESULT:")
+                    (println r)
+                    (println anime_arr)
+                    (println anime_name)
+                    (bot/answer_inline_query bot-token id r))))) ;; (bot/answer_inline_query bot-token id results) [(inline/create_result_article "Anime" (first r))]
 
 (def h [
   (handlers/create_command "start" #(bot/send_message bot-token (get-in % [:message :chat :id]) (str "HI! " emoji/WINKING_FACE)))

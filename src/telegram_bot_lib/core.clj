@@ -19,8 +19,8 @@
 
 (def myanimelist-search-api "http://myanimelist.net/api/anime/search.xml")
 (def myanimelist-get-list-api "http://myanimelist.net/malappinfo.php") ;;?u=domokun1134&status=all&type=anime
-(def myanimelist-auth ["***REMOVED***" "***REMOVED***"])
-(def default-user ["1" "***REMOVED***" "***REMOVED***"])
+(def myanimelist-auth ["l" ""])
+(def default-user ["1" "" ""])
 
 (def users-file "./users.txt")
 (def ^:dynamic users [])
@@ -192,5 +192,5 @@
     (println (:body r)))
   ;;(println (bot/send_message "***REMOVED***" 53941045 "kokoko"))
   (updater/start_handlers h (updater/start_polling bot-token 100 1000 0))
-  ;;(updater/start_handlers h (updater/start_webhook bot-token "***REMOVED***.tk" 8443 "hook" "cert.pem" "cert.keystore" "***REMOVED***"))
+  ;;(updater/start_handlers h (updater/start_webhook bot-token "***REMOVED***" 8443 "hook" "cert.pem" "cert.keystore" "***REMOVED***"))
   (updater/idle))
